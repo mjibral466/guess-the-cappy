@@ -10,5 +10,5 @@ const CONFIG = {
   "phraseHash": "b67ec21478b184b7d9b315ee14984c4a3d00979717cb63c2c12b5afa018f8177",
   "flagHash": "530e8d792e0cab2a6c886068a8547244a3996c8caf2e2bf666ba4a5361019a93",
   "zipFile": "assets/barcode.zip",
-  "showTool": true
+  "showTool": false
 };
