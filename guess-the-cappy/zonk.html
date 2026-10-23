@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0f14">
+<title>ZONK!</title>
+<style>
+  html, body { margin: 0; background: #0b0f14; color: #d7e3ee;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+  .box { max-width: 420px; width: 100%; }
+  h1 { color: #ff5c6c; font-size: 34px; margin: 12px 0 4px; letter-spacing: 2px; }
+  p { color: #7d92a6; font-size: 15px; line-height: 1.5; }
+  img { max-width: 80%; max-height: 300px; border-radius: 16px; }
+  .fallback { font-size: 120px; }
+  .code { color: #ffc857; }
+</style>
+</head>
+<body>
+<div class="box">
+  <img id="cappy" src="assets/cappy.png" alt="Cappy" onerror="this.outerHTML='<div class=&quot;fallback&quot;>🐹</div>'">
+  <h1>ZONK!</h1>
+  <p>Maaf, kamu dapat zonk.<br>Barcode <span id="c" class="code"></span> bukan jawabannya.</p>
+  <p>Coba barcode yang lain!</p>
+</div>
+<script>
+  var c = new URLSearchParams(location.search).get("c") || "";
+  document.getElementById("c").textContent = c.replace(/[^a-z0-9]/gi, "").slice(0, 12);
+</script>
+</body>
+</html>

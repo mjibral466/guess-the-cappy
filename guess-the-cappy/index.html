@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f14">
+<title>Guess the Cappy</title>
+<style>
+  :root {
+    --bg: #0b0f14; --panel: #121a23; --line: #1f2c3a;
+    --text: #d7e3ee; --muted: #7d92a6; --green: #39ff88; --red: #ff5c6c; --amber: #ffc857;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  body { min-height: 100vh; padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
+  .wrap { max-width: 480px; margin: 0 auto; }
+  header { text-align: center; margin: 8px 0 20px; }
+  h1 { margin: 0; font-size: 24px; letter-spacing: 2px; color: var(--green); text-shadow: 0 0 12px rgba(57,255,136,.35); }
+  .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+  h2 { margin: 0 0 4px; font-size: 16px; color: var(--amber); }
+  .tag { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+  p { line-height: 1.55; font-size: 14px; margin: 8px 0; }
+  label { display: block; font-size: 12px; color: var(--muted); margin: 14px 0 6px; }
+  input[type=text] { width: 100%; padding: 13px 12px; font: inherit; font-size: 16px; color: var(--text);
+    background: #0b121a; border: 1px solid var(--line); border-radius: 8px; outline: none; }
+  input[type=text]:focus { border-color: var(--green); }
+  button, .btn { display: block; width: 100%; margin-top: 12px; padding: 13px; font: inherit; font-size: 15px; font-weight: 700;
+    color: #04130a; background: var(--green); border: 0; border-radius: 8px; text-align: center; text-decoration: none; cursor: pointer; }
+  button:active, .btn:active { transform: scale(.98); }
+  .btn.ghost { background: transparent; color: var(--green); border: 1px solid var(--green); }
+  .cipher { font-size: 30px; letter-spacing: 4px; text-align: center; padding: 20px 8px; margin: 10px 0;
+    background: #0b121a; border: 1px dashed var(--green); border-radius: 8px; color: var(--green); word-break: break-all; }
+  .question { font-size: 18px; text-align: center; padding: 14px; margin: 10px 0; background: #0b121a;
+    border-left: 3px solid var(--amber); border-radius: 4px; }
+  .msg { min-height: 18px; margin-top: 10px; font-size: 13px; }
+  .msg.err { color: var(--red); } .msg.ok { color: var(--green); }
+  .hidden { display: none !important; }
+  details { margin-top: 12px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+  input[type=range] { width: 100%; margin: 12px 0 6px; accent-color: var(--green); }
+  .tool-out { text-align: center; font-size: 22px; letter-spacing: 3px; color: var(--text); padding: 8px; }
+  .small { font-size: 12px; color: var(--muted); }
+  #logout { background: none; color: var(--muted); border: 0; width: auto; display: inline-block; margin: 8px auto 0;
+    font-weight: 400; font-size: 12px; text-decoration: underline; }
+  .center { text-align: center; }
+  .big { font-size: 46px; margin: 6px 0; }
+  .time { font-size: 38px; color: var(--green); margin: 8px 0; }
+  .shake { animation: shake .35s; }
+  @keyframes shake { 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>GUESS THE CAPPY</h1>
+    <div class="sub">// ctf villa edition</div>
+  </header>
+
+  <!-- LOGIN -->
+  <section id="login" class="panel hidden">
+    <h2>Masuk Tim</h2>
+    <div class="tag">// masukkan kode tim dari panitia</div>
+    <form id="login-form" autocomplete="off">
+      <label for="code">KODE TIM</label>
+      <input id="code" type="text" placeholder="CAPPY-XXX" autocapitalize="characters" autocorrect="off" spellcheck="false">
+      <button type="submit">MASUK</button>
+      <div id="login-msg" class="msg"></div>
+    </form>
+  </section>
+
+  <!-- STAGE 1 -->
+  <section id="stage1" class="hidden">
+    <div class="panel">
+      <h2>Quest 1 &mdash; Caesar Cipher</h2>
+      <div class="tag">// <span id="team-name-1"></span></div>
+      <p>Pecahkan pesan rahasia timmu:</p>
+      <div id="cipher" class="cipher"></div>
+      <p id="hint" class="small"></p>
+      <details id="tool">
+        <summary>Alat bantu: geser huruf</summary>
+        <input id="shift" type="range" min="1" max="25" value="1">
+        <div class="small center">geser mundur <span id="shift-val">1</span> huruf</div>
+        <div id="tool-out" class="tool-out"></div>
+      </details>
+    </div>
+    <div class="panel">
+      <p>Gabungkan jawaban <b>semua tim</b> jadi satu kalimat pertanyaan, lalu tulis di sini:</p>
+      <form id="phrase-form" autocomplete="off">
+        <input id="phrase" type="text" placeholder="susun kalimatnya..." autocorrect="off" spellcheck="false">
+        <button type="submit">KIRIM JAWABAN</button>
+        <div id="phrase-msg" class="msg"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- STAGE 2 -->
+  <section id="stage2" class="hidden">
+    <div class="panel">
+      <h2>Quest 2 &mdash; Temukan Flag</h2>
+      <div class="tag">// <span id="team-name-2"></span> &bull; quest terbuka!</div>
+      <p>Jawab pertanyaan ini:</p>
+      <div id="quest-q" class="question"></div>
+      <p>Unduh file barcode di bawah. Isinya banyak sekali barcode bernama <b>acr001</b> sampai <b>acr365</b>. Hanya satu yang menyimpan flag. Sisanya&hellip; hati-hati zonk!</p>
+      <a id="zip-link" class="btn ghost" download>UNDUH FILE BARCODE (.zip)</a>
+      <p class="small">Tip: buka gambar di galeri lalu scan pakai Google Lens / kamera, atau scan dari layar HP temanmu.</p>
+    </div>
+    <div class="panel">
+      <form id="flag-form" autocomplete="off">
+        <label for="flag">FLAG</label>
+        <input id="flag" type="text" placeholder="tulis flag di sini" autocorrect="off" spellcheck="false">
+        <button type="submit">SUBMIT FLAG</button>
+        <div id="flag-msg" class="msg"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- WIN -->
+  <section id="win" class="panel center hidden">
+    <div class="big">🎉</div>
+    <h2>FLAG BENAR!</h2>
+    <p><b id="win-team"></b> berhasil menyelesaikan semua quest.</p>
+    <div class="small">waktu pengerjaan</div>
+    <div id="win-time" class="time"></div>
+    <div class="small">selesai pukul <span id="win-clock"></span></div>
+    <p class="small">Tunjukkan layar ini ke panitia!</p>
+  </section>
+
+  <div class="center"><button id="logout" class="hidden">keluar dari tim</button></div>
+</div>
+
+<script src="config.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
