@@ -109,31 +109,35 @@ if (typeof document !== "undefined") {
     return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
   }
 
+  
   function render() {
-    if (!state) return show("login");
-    team = loginTeam(CONFIG, state.code);
-    if (!team) { clear(); state = null; return show("login"); }
-
-    if (state.stage === 1) {
-      $("team-name-1").textContent = team.data.name;
-      $("cipher").textContent = team.data.ct;
-      $("hint").textContent = team.data.hint;
+      // Sembunyikan alat bantu jika showTool bernilai false
       $("tool").classList.toggle("hidden", !CONFIG.showTool);
-      updateTool();
-      show("stage1");
-    } else if (state.stage === 2) {
-      $("team-name-2").textContent = team.data.name;
-      const q = normText(state.phrase || "");
-      $("quest-q").textContent = q ? q.charAt(0).toUpperCase() + q.slice(1) + "?" : "";
-      $("zip-link").href = CONFIG.zipFile;
-      show("stage2");
-    } else {
-      $("win-team").textContent = team.data.name;
-      $("win-time").textContent = fmtDuration((state.end || Date.now()) - state.start);
-      $("win-clock").textContent = state.end ? new Date(state.end).toLocaleTimeString("id-ID") : "";
-      show("win");
-    }
+
+      if (!state) return show("login");
+      team = loginTeam(CONFIG, state.code);
+      if (!team) { clear(); state = null; return show("login"); }
+
+      if (state.stage === 1) {
+        $("team-name-1").textContent = team.data.name;
+        $("cipher").textContent = team.data.ct;
+        $("hint").textContent = team.data.hint;
+        updateTool();
+        show("stage1");
+      } else if (state.stage === 2) {
+        $("team-name-2").textContent = team.data.name;
+        const q = normText(state.phrase || "");
+        $("quest-q").textContent = q ? q.charAt(0).toUpperCase() + q.slice(1) + "?" : "";
+        $("zip-link").href = CONFIG.zipFile;
+        show("stage2");
+      } else {
+        $("win-team").textContent = team.data.name;
+        $("win-time").textContent = fmtDuration((state.end || Date.now()) - state.start);
+        $("win-clock").textContent = state.end ? new Date(state.end).toLocaleTimeString("id-ID") : "";
+        show("win");
+      }
   }
+
 
   function updateTool() {
     const n = parseInt($("shift").value, 10);
